@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Game Console</title>
+    <title>Interactive Game Scoreboard</title>
     <style>
         :root {
             --bg: #0f172a;
@@ -16,7 +16,7 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: sans-serif;
             background-color: var(--bg);
             color: var(--text);
             display: flex;
@@ -25,48 +25,43 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.2s;
         }
 
-        /* The 2x2 Grid */
         .main-container {
             display: grid;
-            grid-template-columns: repeat(2, 380px);
-            grid-template-rows: repeat(2, 400px);
-            gap: 25px;
+            grid-template-columns: repeat(2, minmax(300px, 380px));
+            grid-template-rows: repeat(2, minmax(350px, 400px));
+            gap: 20px;
+            padding: 20px;
         }
 
-        /* Box Styling */
         .box {
             background: var(--card);
-            border-radius: 2rem;
-            padding: 2.5rem;
+            border-radius: 1.5rem;
+            padding: 2rem;
             text-align: center;
             border: 2px solid #334155;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .label {
             color: var(--accent);
             text-transform: uppercase;
-            font-weight: 800;
-            font-size: 1rem;
-            letter-spacing: 2px;
+            font-weight: bold;
+            letter-spacing: 1px;
         }
 
-        /* Displays */
         .display-text {
-            font-size: 6rem;
+            font-size: 5rem;
             font-weight: 900;
-            font-family: 'Courier New', monospace;
-            margin: 15px 0;
-            line-height: 1;
+            font-family: monospace;
+            margin: 10px 0;
         }
 
-        /* Editable Elements */
         input {
             background: transparent;
             border: none;
@@ -76,52 +71,40 @@
         }
 
         .team-input {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: bold;
             border-bottom: 2px solid #334155;
             width: 100%;
-            padding-bottom: 5px;
-            transition: border-color 0.3s;
         }
-
-        .team-input:focus { border-color: var(--accent); }
 
         .clock-input {
-            width: 130px;
-            font-size: 6rem;
+            width: 100px;
+            font-size: 5rem;
             font-weight: 900;
-            font-family: 'Courier New', monospace;
+            font-family: monospace;
         }
 
-        /* Button Layouts */
         .btn-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
         }
 
         button {
-            padding: 14px;
+            padding: 12px;
             border: none;
-            border-radius: 12px;
+            border-radius: 8px;
             font-weight: bold;
-            font-size: 1rem;
             cursor: pointer;
             color: white;
-            transition: all 0.1s;
         }
 
-        button:hover { filter: brightness(1.2); }
-        button:active { transform: scale(0.96); }
+        button:active { transform: scale(0.95); }
 
         .green { background: var(--success); }
         .red { background: var(--danger); }
         .blue { background: var(--secondary); }
-        .gray { background: #475569; margin-top: 40px; padding: 12px 40px; }
-
-        /* Hide arrows on number inputs */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .gray { background: #475569; margin-top: 20px; padding: 10px 30px; }
 
         .flash-red { background-color: #7f1d1d !important; }
     </style>
@@ -136,7 +119,7 @@
                 <input type="number" id="s" class="clock-input" value="00">
             </div>
             <div class="btn-group">
-                <button class="green" id="startBtn" onclick="startClock()">START</button>
+                <button class="green" onclick="startClock()">START</button>
                 <button class="red" onclick="stopClock()">PAUSE</button>
             </div>
         </div>
@@ -145,15 +128,7 @@
             <div class="label">Quick Timer</div>
             <div id="qDisplay" class="display-text">00</div>
             <div class="btn-group">
-                <button class="blue" onclick="quickTimer(10)">10 SECONDS</button>
-                <button class="blue" onclick="quickTimer(20)">20 SECONDS</button>
+                <button class="blue" onclick="quickTimer(10)">10s</button>
+                <button class="blue" onclick="quickTimer(20)">20s</button>
             </div>
         </div>
-
-        <div class="box">
-            <input type="text" class="team-input" value="HOME">
-            <div id="score1" class="display-text">00</div>
-            <div class="btn-group">
-                <button class="green" onclick="changeScore('score1', 10)">+10</button>
-                <button class="green" onclick="changeScore('score1', 5)">+5</button>
-                <button class="red" onclick="changeScore
