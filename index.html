@@ -131,8 +131,101 @@
         </div>
 
         <div class="box">
-            <div class="label">Quick Timer</div>
+            <div class="label">Question Timer</div>
             <div id="quick-display" class="main-display">00</div>
             <div class="controls">
                 <button class="btn-blue" onclick="runQuick(10)">10 Seconds</button>
-                <button class="btn-blue
+                <button class="btn-blue" onclick="runQuick(20)">20 Seconds</button>
+            </div>
+        </div>
+
+        <div class="box">
+            <input type="text" class="team-name" value="HOME">
+            <div id="s1" class="main-display">0</div>
+            <div class="controls">
+                <button class="btn-green" onclick="add('s1', 10)">+10</button>
+                <button class="btn-green" onclick="add('s1', 5)">+5</button>
+                <button class="btn-red" onclick="add('s1', -10)">-10</button>
+                <button class="btn-red" onclick="add('s1', -5)">-5</button>
+            </div>
+        </div>
+
+        <div class="box">
+            <input type="text" class="team-name" value="AWAY">
+            <div id="s2" class="main-display">0</div>
+            <div class="controls">
+                <button class="btn-green" onclick="add('s2', 10)">+10</button>
+                <button class="btn-green" onclick="add('s2', 5)">+5</button>
+                <button class="btn-red" onclick="add('s2', -10)">-10</button>
+                <button class="btn-red" onclick="add('s2', -5)">-5</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Game Clock Logic ---
+        let mainInterval;
+        let isRunning = false;
+
+        function toggleClock() {
+            if (isRunning) return;
+            isRunning = true;
+            document.getElementById('start-btn').style.opacity = "0.5";
+
+            mainInterval = setInterval(() => {
+                let m = parseInt(document.getElementById('min').value);
+                let s = parseInt(document.getElementById('sec').value);
+
+                if (m === 0 && s === 0) {
+                    pauseClock();
+                    alert("Time is up!");
+                    return;
+                }
+
+                if (s <= 0) {
+                    m--;
+                    s = 59;
+                } else {
+                    s--;
+                }
+
+                document.getElementById('min').value = m;
+                document.getElementById('sec').value = s.toString().padStart(2, '0');
+            }, 1000);
+        }
+
+        function pauseClock() {
+            clearInterval(mainInterval);
+            isRunning = false;
+            document.getElementById('start-btn').style.opacity = "1";
+        }
+
+        // --- Quick Timer Logic ---
+        let quickInterval;
+        function runQuick(seconds) {
+            clearInterval(quickInterval);
+            let time = seconds;
+            const display = document.getElementById('quick-display');
+            display.innerText = time;
+            display.style.color = "white";
+
+            quickInterval = setInterval(() => {
+                time--;
+                display.innerText = time.toString().padStart(2, '0');
+                if (time <= 0) {
+                    clearInterval(quickInterval);
+                    display.style.color = "var(--danger)";
+                }
+            }, 1000);
+        }
+
+        // --- Score Logic ---
+        function add(id, amt) {
+            let el = document.getElementById(id);
+            let val = parseInt(el.innerText) + amt;
+            el.innerText = val < 0 ? 0 : val;
+        }
+    </script>
+</body>
+</html>
