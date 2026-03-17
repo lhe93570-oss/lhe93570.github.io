@@ -160,33 +160,47 @@
 
     <script>
         let mainInterval, quickInterval;
-
+    
         // Clock Logic
         function startClock() {
             if (mainInterval) return;
             mainInterval = setInterval(() => {
-                let min = parseInt(document.getElementById('m').value);
-                let sec = parseInt(document.getElementById('s').value);
+                let mInput = document.getElementById('m');
+                let sInput = document.getElementById('s');
+                
+                let min = parseInt(mInput.value);
+                let sec = parseInt(sInput.value);
+    
                 if (min === 0 && sec === 0) {
                     stopClock();
                     alert("Game Over!");
                 } else {
-                    if (sec === 0) { min--; sec = 59; } else { sec--; }
-                    document.getElementById('m').value = min;
-                    document.getElementById('sec');
-                    document.getElementById('s').value = sec.toString().padStart(2, '0');
+                    if (sec === 0) {
+                        min--;
+                        sec = 59;
+                    } else {
+                        sec--;
+                    }
+                    // Update display with padding for symmetry
+                    mInput.value = min.toString().padStart(2, '0');
+                    sInput.value = sec.toString().padStart(2, '0');
                 }
             }, 1000);
         }
-        function stopClock() { clearInterval(mainInterval); mainInterval = null; }
-
+    
+        function stopClock() { 
+            clearInterval(mainInterval); 
+            mainInterval = null; 
+        }
+    
         // Quick Timer Logic
         function quickTimer(duration) {
             clearInterval(quickInterval);
             let time = duration;
             const display = document.getElementById('qDisplay');
-            display.innerText = time;
-            display.style.color = "white";
+            display.innerText = time.toString().padStart(2, '0');
+            display.style.color = "var(--accent)"; // Reset color from red
+            
             quickInterval = setInterval(() => {
                 time--;
                 display.innerText = time.toString().padStart(2, '0');
@@ -196,12 +210,14 @@
                 }
             }, 1000);
         }
-
+    
         // Score Logic
         function changeScore(id, amt) {
             let el = document.getElementById(id);
-            let val = parseInt(el.innerText) + amt;
-            el.innerText = val < 0 ? "00" : val.toString().padStart(2, '0');
+            let currentVal = parseInt(el.innerText);
+            let newVal = currentVal + amt;
+            // Ensure score doesn't go below 0 and stays 2 digits
+            el.innerText = (newVal < 0 ? 0 : newVal).toString().padStart(2, '0');
         }
     </script>
 </body>
