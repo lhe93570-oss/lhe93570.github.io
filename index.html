@@ -54,12 +54,16 @@
             letter-spacing: 1px;
         }
 
-        /* Displays */
+        /* Updated Display Text to keep everything centered and tight */
         .display-text {
-            font-size: 5.5rem;
+            font-size: 5rem; /* Slightly reduced from 5.5rem */
             font-weight: 800;
             font-family: 'Courier New', monospace;
             margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
         }
 
         /* Inputs */
@@ -75,12 +79,14 @@
             border-bottom: 2px solid #334155;
             width: 100%;
             margin-bottom: 10px;
-        }
+            
+        /* Updated Clock Input to fit the container */
         .clock-input {
-            width: 120px;
-            font-size: 5.5rem;
+            width: 110px; /* Reduced from 120px */
+            font-size: 5rem; /* Matches the display text */
             font-weight: 800;
             font-family: 'Courier New', monospace;
+            outline: none; /* Removes the focus ring for a cleaner look */
         }
 
         /* Buttons */
