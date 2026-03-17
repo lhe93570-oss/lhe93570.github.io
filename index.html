@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Game Console</title>
+    <title>Symmetrical Game Console</title>
     <style>
         :root {
             --bg: #0f172a;
@@ -14,205 +14,91 @@
             --success: #22c55e;
         }
         body {
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            margin: 0;
         }
 
-        /* Top Left Timer Section */
-        .top-controls {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            display: flex;
+        /* 2x2 Grid Layout */
+        .main-container {
+            display: grid;
+            grid-template-columns: repeat(2, 350px);
+            grid-template-rows: repeat(2, 380px);
             gap: 20px;
+        }
+
+        /* Unified Box Style */
+        .box {
             background: var(--card);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #334155;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-
-        .timer-box {
-            text-align: center;
-            border-right: 1px solid #334155;
-            padding-right: 20px;
-        }
-        .timer-box:last-child { border: none; padding-right: 0; }
-
-        .timer-label { font-size: 0.7rem; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
-        
-        /* Game Clock Inputs */
-        .clock-input-group { display: flex; align-items: center; gap: 5px; margin-bottom: 8px; }
-        .clock-input-group input {
-            width: 45px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: white;
-            font-size: 1.2rem;
-            text-align: center;
-            border-radius: 4px;
-        }
-
-        /* Scoreboard Section */
-        .scoreboard {
-            display: flex;
-            gap: 2rem;
-            margin-top: 80px;
-        }
-        .team-card {
-            background: var(--card);
+            border-radius: 1.5rem;
             padding: 2rem;
-            border-radius: 1rem;
             text-align: center;
-            width: 260px;
-            border: 1px solid #334155;
+            border: 2px solid #334155;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
-        .score-display { font-size: 5rem; font-weight: 800; margin: 1rem 0; color: var(--text); }
-        input.team-name {
+
+        .label {
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        /* Displays */
+        .display-text {
+            font-size: 5.5rem;
+            font-weight: 800;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+
+        /* Inputs */
+        input {
             background: transparent;
             border: none;
-            border-bottom: 2px solid #334155;
-            color: var(--accent);
-            font-size: 1.5rem;
+            color: white;
             text-align: center;
-            width: 100%;
         }
-
-        /* Generic Buttons */
-        button {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+        .team-input {
+            font-size: 1.8rem;
             font-weight: bold;
-            font-size: 0.8rem;
-            transition: filter 0.2s;
+            border-bottom: 2px solid #334155;
+            width: 100%;
+            margin-bottom: 10px;
         }
-        button:active { transform: translateY(1px); }
-        .btn-green { background: var(--success); color: white; }
-        .btn-red { background: var(--danger); color: white; }
-        .btn-blue { background: #6366f1; color: white; }
-        
-        .score-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-        .score-btns button { padding: 10px; }
-    </style>
-</head>
-<body>
-
-    <div class="top-controls">
-        <div class="timer-box">
-            <div class="timer-label">Game Clock</div>
-            <div class="clock-input-group">
-                <input type="number" id="min" value="10" min="0" max="99">
-                <span>:</span>
-                <input type="number" id="sec" value="00" min="0" max="59">
-            </div>
-            <button class="btn-green" id="start-btn" onclick="toggleGameClock()">Start</button>
-            <button class="btn-red" onclick="pauseGameClock()">Pause</button>
-        </div>
-
-        <div class="timer-box">
-            <div class="timer-label">Quick Timer</div>
-            <div id="quick-display" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px;">00</div>
-            <button class="btn-blue" onclick="runQuickTimer(10)">10s</button>
-            <button class="btn-blue" onclick="runQuickTimer(20)">20s</button>
-        </div>
-    </div>
-
-    <div class="scoreboard">
-        <div class="team-card">
-            <input type="text" class="team-name" value="HOME">
-            <div class="score-display" id="s1">0</div>
-            <div class="score-btns">
-                <button class="btn-green" onclick="add('s1', 10)">+10</button>
-                <button class="btn-green" onclick="add('s1', 5)">+5</button>
-                <button class="btn-red" onclick="add('s1', -10)">-10</button>
-                <button class="btn-red" onclick="add('s1', -5)">-5</button>
-            </div>
-        </div>
-
-        <div class="team-card">
-            <input type="text" class="team-name" value="AWAY">
-            <div class="score-display" id="s2">0</div>
-            <div class="score-btns">
-                <button class="btn-green" onclick="add('s2', 10)">+10</button>
-                <button class="btn-green" onclick="add('s2', 5)">+5</button>
-                <button class="btn-red" onclick="add('s2', -10)">-10</button>
-                <button class="btn-red" onclick="add('s2', -5)">-5</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // --- Game Clock Logic ---
-        let mainInterval;
-        let isRunning = false;
-
-        function toggleGameClock() {
-            if (isRunning) return;
-            isRunning = true;
-            document.getElementById('start-btn').disabled = true;
-
-            mainInterval = setInterval(() => {
-                let m = parseInt(document.getElementById('min').value);
-                let s = parseInt(document.getElementById('sec').value);
-
-                if (m === 0 && s === 0) {
-                    pauseGameClock();
-                    alert("Game Over!");
-                    return;
-                }
-
-                if (s === 0) {
-                    m--;
-                    s = 59;
-                } else {
-                    s--;
-                }
-
-                document.getElementById('min').value = m;
-                document.getElementById('sec').value = s.toString().padStart(2, '0');
-            }, 1000);
+        .clock-input {
+            width: 120px;
+            font-size: 5.5rem;
+            font-weight: 800;
+            font-family: 'Courier New', monospace;
         }
 
-        function pauseGameClock() {
-            clearInterval(mainInterval);
-            isRunning = false;
-            document.getElementById('start-btn').disabled = false;
+        /* Buttons */
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
-
-        // --- Quick Timer Logic ---
-        let quickInterval;
-        function runQuickTimer(seconds) {
-            clearInterval(quickInterval);
-            let time = seconds;
-            const display = document.getElementById('quick-display');
-            display.innerText = time;
-            display.style.color = "white";
-
-            quickInterval = setInterval(() => {
-                time--;
-                display.innerText = time.toString().padStart(2, '0');
-                if (time <= 0) {
-                    clearInterval(quickInterval);
-                    display.style.color = "red";
-                }
-            }, 1000);
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.1s;
         }
-
-        // --- Score Logic ---
-        function add(id, amt) {
-            let el = document.getElementById(id);
-            let val = parseInt(el.innerText) + amt;
-            el.innerText = val < 0 ? 0 : val;
-        }
-    </script>
-</body>
-</html>
+        button:active { transform: scale(0.95); }
+        .green { background: var(--success); }
+        .red { background: var(--danger); }
+        .blue { background: #6366
