@@ -54,16 +54,12 @@
             letter-spacing: 1px;
         }
 
-        /* Updated Display Text to keep everything centered and tight */
+        /* Displays */
         .display-text {
-            font-size: 5rem; /* Slightly reduced from 5.5rem */
+            font-size: 5.5rem;
             font-weight: 800;
             font-family: 'Courier New', monospace;
             margin: 10px 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
         }
 
         /* Inputs */
@@ -79,14 +75,12 @@
             border-bottom: 2px solid #334155;
             width: 100%;
             margin-bottom: 10px;
-            
-        /* Updated Clock Input to fit the container */
+        }
         .clock-input {
-            width: 110px; /* Reduced from 120px */
-            font-size: 5rem; /* Matches the display text */
+            width: 120px;
+            font-size: 5.5rem;
             font-weight: 800;
             font-family: 'Courier New', monospace;
-            outline: none; /* Removes the focus ring for a cleaner look */
         }
 
         /* Buttons */
@@ -121,7 +115,7 @@
         <div class="box">
             <div class="label">Game Clock</div>
             <div class="display-text">
-                <input type="number" id="m" class="clock-input" value="15">:
+                <input type="number" id="m" class="clock-input" value="10">:
                 <input type="number" id="s" class="clock-input" value="00">
             </div>
             <div class="btn-group">
@@ -166,47 +160,33 @@
 
     <script>
         let mainInterval, quickInterval;
-    
+
         // Clock Logic
         function startClock() {
             if (mainInterval) return;
             mainInterval = setInterval(() => {
-                let mInput = document.getElementById('m');
-                let sInput = document.getElementById('s');
-                
-                let min = parseInt(mInput.value);
-                let sec = parseInt(sInput.value);
-    
+                let min = parseInt(document.getElementById('m').value);
+                let sec = parseInt(document.getElementById('s').value);
                 if (min === 0 && sec === 0) {
                     stopClock();
                     alert("Game Over!");
                 } else {
-                    if (sec === 0) {
-                        min--;
-                        sec = 59;
-                    } else {
-                        sec--;
-                    }
-                    // Update display with padding for symmetry
-                    mInput.value = min.toString().padStart(2, '0');
-                    sInput.value = sec.toString().padStart(2, '0');
+                    if (sec === 0) { min--; sec = 59; } else { sec--; }
+                    document.getElementById('m').value = min;
+                    document.getElementById('sec');
+                    document.getElementById('s').value = sec.toString().padStart(2, '0');
                 }
             }, 1000);
         }
-    
-        function stopClock() { 
-            clearInterval(mainInterval); 
-            mainInterval = null; 
-        }
-    
+        function stopClock() { clearInterval(mainInterval); mainInterval = null; }
+
         // Quick Timer Logic
         function quickTimer(duration) {
             clearInterval(quickInterval);
             let time = duration;
             const display = document.getElementById('qDisplay');
-            display.innerText = time.toString().padStart(2, '0');
-            display.style.color = "var(--accent)"; // Reset color from red
-            
+            display.innerText = time;
+            display.style.color = "white";
             quickInterval = setInterval(() => {
                 time--;
                 display.innerText = time.toString().padStart(2, '0');
@@ -216,14 +196,12 @@
                 }
             }, 1000);
         }
-    
+
         // Score Logic
         function changeScore(id, amt) {
             let el = document.getElementById(id);
-            let currentVal = parseInt(el.innerText);
-            let newVal = currentVal + amt;
-            // Ensure score doesn't go below 0 and stays 2 digits
-            el.innerText = (newVal < 0 ? 0 : newVal).toString().padStart(2, '0');
+            let val = parseInt(el.innerText) + amt;
+            el.innerText = val < 0 ? "00" : val.toString().padStart(2, '0');
         }
     </script>
 </body>
