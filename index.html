@@ -172,23 +172,20 @@
 
     <button class="gray" onclick="window.location.reload()">Reset Entire Board</button>
 
-    <script>
+<script>
         let mainInterval = null;
         let quickInterval = null;
         let quickTimeLeft = 0;
 
         // Buzzer Audio Generator
         function playBuzzer() {
-            // Use Web Audio API to create a buzzer sound without needing external files
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             
-            // 'square' wave creates a harsh, buzzer-like sound
             oscillator.type = 'square';
             oscillator.frequency.setValueAtTime(300, audioCtx.currentTime); 
             
-            // Fade out the sound quickly over 1 second
             gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 1);
             
@@ -202,23 +199,44 @@
         // Game Clock Logic
         function startClock() {
             if (mainInterval) return;
+            
+            let mInput = document.getElementById('m');
+            let sInput = document.getElementById('s');
+
+            // BUG FIX 3: Sanitize manual inputs (prevent empty/NaN or negative numbers)
+            let min = Math.max(0, parseInt(mInput.value) || 0);
+            let sec = Math.max(0, parseInt(sInput.value) || 0);
+            
+            // Format immediately just in case user typed single digits
+            mInput.value = min;
+            sInput.value = sec.toString().padStart(2, '0');
+
+            // Don't start if already at zero
+            if (min === 0 && sec === 0) return;
+
             mainInterval = setInterval(() => {
-                let min = parseInt(document.getElementById('m').value);
-                let sec = parseInt(document.getElementById('s').value);
+                // BUG FIX 1: Decrement the time FIRST...
+                if (sec === 0) { 
+                    min--; 
+                    sec = 59; 
+                } else { 
+                    sec--; 
+                }
                 
+                // ...Then update the UI...
+                mInput.value = min;
+                sInput.value = sec.toString().padStart(2, '0');
+
+                // ...Then check if it hit zero.
                 if (min === 0 && sec === 0) {
                     stopClock();
                     playBuzzer();
-                    alert("Game Over!");
-                } else {
-                    if (sec === 0) { 
-                        min--; 
-                        sec = 59; 
-                    } else { 
-                        sec--; 
-                    }
-                    document.getElementById('m').value = min;
-                    document.getElementById('s').value = sec.toString().padStart(2, '0');
+                    
+                    // BUG FIX 2: Add a tiny delay to the alert so the buzzer has time to play
+                    // and the UI has time to visually update to 0:00
+                    setTimeout(() => {
+                        alert("Game Over!");
+                    }, 50);
                 }
             }, 1000);
         }
@@ -234,6 +252,9 @@
             quickTimeLeft = duration;
             updateQuickDisplay();
             document.getElementById('qDisplay').style.color = "white";
+            
+            // Start the timer immediately after setting it
+            startQuickTimer(); 
         }
 
         function startQuickTimer() {
