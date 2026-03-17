@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Symmetrical Game Console</title>
+    <title>Pro Game Console</title>
     <style>
         :root {
             --bg: #0f172a;
@@ -12,9 +12,11 @@
             --text: #f8fafc;
             --danger: #ef4444;
             --success: #22c55e;
+            --secondary: #6366f1;
         }
+
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             display: flex;
@@ -23,82 +25,135 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
+            transition: background-color 0.3s ease;
         }
 
-        /* 2x2 Grid Layout */
+        /* The 2x2 Grid */
         .main-container {
             display: grid;
-            grid-template-columns: repeat(2, 350px);
-            grid-template-rows: repeat(2, 380px);
-            gap: 20px;
+            grid-template-columns: repeat(2, 380px);
+            grid-template-rows: repeat(2, 400px);
+            gap: 25px;
         }
 
-        /* Unified Box Style */
+        /* Box Styling */
         .box {
             background: var(--card);
-            border-radius: 1.5rem;
-            padding: 2rem;
+            border-radius: 2rem;
+            padding: 2.5rem;
             text-align: center;
             border: 2px solid #334155;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
         .label {
             color: var(--accent);
             text-transform: uppercase;
-            font-weight: bold;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 2px;
         }
 
         /* Displays */
         .display-text {
-            font-size: 5.5rem;
-            font-weight: 800;
+            font-size: 6rem;
+            font-weight: 900;
             font-family: 'Courier New', monospace;
-            margin: 10px 0;
+            margin: 15px 0;
+            line-height: 1;
         }
 
-        /* Inputs */
+        /* Editable Elements */
         input {
             background: transparent;
             border: none;
             color: white;
             text-align: center;
+            outline: none;
         }
+
         .team-input {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: bold;
             border-bottom: 2px solid #334155;
             width: 100%;
-            margin-bottom: 10px;
+            padding-bottom: 5px;
+            transition: border-color 0.3s;
         }
+
+        .team-input:focus { border-color: var(--accent); }
+
         .clock-input {
-            width: 120px;
-            font-size: 5.5rem;
-            font-weight: 800;
+            width: 130px;
+            font-size: 6rem;
+            font-weight: 900;
             font-family: 'Courier New', monospace;
         }
 
-        /* Buttons */
+        /* Button Layouts */
         .btn-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
         }
+
         button {
-            padding: 12px;
+            padding: 14px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-weight: bold;
+            font-size: 1rem;
             cursor: pointer;
             color: white;
-            transition: transform 0.1s;
+            transition: all 0.1s;
         }
-        button:active { transform: scale(0.95); }
+
+        button:hover { filter: brightness(1.2); }
+        button:active { transform: scale(0.96); }
+
         .green { background: var(--success); }
         .red { background: var(--danger); }
-        .blue { background: #6366
+        .blue { background: var(--secondary); }
+        .gray { background: #475569; margin-top: 40px; padding: 12px 40px; }
+
+        /* Hide arrows on number inputs */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        .flash-red { background-color: #7f1d1d !important; }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="box">
+            <div class="label">Game Clock</div>
+            <div class="display-text">
+                <input type="number" id="m" class="clock-input" value="10">:
+                <input type="number" id="s" class="clock-input" value="00">
+            </div>
+            <div class="btn-group">
+                <button class="green" id="startBtn" onclick="startClock()">START</button>
+                <button class="red" onclick="stopClock()">PAUSE</button>
+            </div>
+        </div>
+
+        <div class="box">
+            <div class="label">Quick Timer</div>
+            <div id="qDisplay" class="display-text">00</div>
+            <div class="btn-group">
+                <button class="blue" onclick="quickTimer(10)">10 SECONDS</button>
+                <button class="blue" onclick="quickTimer(20)">20 SECONDS</button>
+            </div>
+        </div>
+
+        <div class="box">
+            <input type="text" class="team-input" value="HOME">
+            <div id="score1" class="display-text">00</div>
+            <div class="btn-group">
+                <button class="green" onclick="changeScore('score1', 10)">+10</button>
+                <button class="green" onclick="changeScore('score1', 5)">+5</button>
+                <button class="red" onclick="changeScore
