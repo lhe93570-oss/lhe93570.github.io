@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Symmetrical Scoreboard with Audio</title>
+    <title>Symmetrical Game Console</title>
     <style>
         :root {
             --bg: #0f172a;
@@ -24,12 +24,16 @@
             min-height: 100vh;
             margin: 0;
         }
+
+        /* 2x2 Grid Layout */
         .main-container {
             display: grid;
             grid-template-columns: repeat(2, 350px);
             grid-template-rows: repeat(2, 380px);
             gap: 20px;
         }
+
+        /* Unified Box Style */
         .box {
             background: var(--card);
             border-radius: 1.5rem;
@@ -41,6 +45,7 @@
             justify-content: space-between;
             box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
+
         .label {
             color: var(--accent);
             text-transform: uppercase;
@@ -48,137 +53,52 @@
             font-size: 0.9rem;
             letter-spacing: 1px;
         }
+
+        /* Displays */
         .display-text {
             font-size: 5.5rem;
             font-weight: 800;
             font-family: 'Courier New', monospace;
             margin: 10px 0;
         }
-        input { background: transparent; border: none; color: white; text-align: center; }
-        .team-input { font-size: 1.8rem; font-weight: bold; border-bottom: 2px solid #334155; width: 100%; margin-bottom: 10px; }
-        .clock-input { width: 120px; font-size: 5.5rem; font-weight: 800; font-family: 'Courier New', monospace; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; transition: transform 0.1s; }
+
+        /* Inputs */
+        input {
+            background: transparent;
+            border: none;
+            color: white;
+            text-align: center;
+        }
+        .team-input {
+            font-size: 1.8rem;
+            font-weight: bold;
+            border-bottom: 2px solid #334155;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .clock-input {
+            width: 120px;
+            font-size: 5.5rem;
+            font-weight: 800;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.1s;
+        }
         button:active { transform: scale(0.95); }
         .green { background: var(--success); }
         .red { background: var(--danger); }
-        .blue { background: #6366f1; }
-        .gray { background: #475569; margin-top: 30px; padding: 10px 30px; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    </style>
-</head>
-<body>
-
-    <div class="main-container">
-        <div class="box">
-            <div class="label">Game Clock</div>
-            <div class="display-text">
-                <input type="number" id="m" class="clock-input" value="10">:
-                <input type="number" id="s" class="clock-input" value="00">
-            </div>
-            <div class="btn-group">
-                <button class="green" id="startBtn" onclick="startClock()">Start</button>
-                <button class="red" onclick="stopClock()">Pause</button>
-            </div>
-        </div>
-
-        <div class="box">
-            <div class="label">Quick Timer</div>
-            <div id="qDisplay" class="display-text">00</div>
-            <div class="btn-group">
-                <button class="blue" onclick="quickTimer(10)">10s</button>
-                <button class="blue" onclick="quickTimer(20)">20s</button>
-            </div>
-        </div>
-
-        <div class="box">
-            <input type="text" class="team-input" value="HOME">
-            <div id="score1" class="display-text">00</div>
-            <div class="btn-group">
-                <button class="green" onclick="changeScore('score1', 10)">+10</button>
-                <button class="green" onclick="changeScore('score1', 5)">+5</button>
-                <button class="red" onclick="changeScore('score1', -10)">-10</button>
-                <button class="red" onclick="changeScore('score1', -5)">-5</button>
-            </div>
-        </div>
-
-        <div class="box">
-            <input type="text" class="team-input" value="AWAY">
-            <div id="score2" class="display-text">00</div>
-            <div class="btn-group">
-                <button class="green" onclick="changeScore('score2', 10)">+10</button>
-                <button class="green" onclick="changeScore('score2', 5)">+5</button>
-                <button class="red" onclick="changeScore('score2', -10)">-10</button>
-                <button class="red" onclick="changeScore('score2', -5)">-5</button>
-            </div>
-        </div>
-    </div>
-
-    <button class="gray" onclick="window.location.reload()">Reset Entire Board</button>
-
-    <script>
-        let mainInterval, quickInterval;
-
-        // Audio Setup (Synthesized Buzzer)
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playBuzzer(duration, frequency) {
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            oscillator.type = 'square'; // Harsh buzzer sound
-            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.start();
-            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-            oscillator.stop(audioCtx.currentTime + duration);
-        }
-
-        // Clock Logic
-        function startClock() {
-            if (mainInterval) return;
-            // Unlock audio context for browsers that block auto-play
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            
-            mainInterval = setInterval(() => {
-                let min = parseInt(document.getElementById('m').value);
-                let sec = parseInt(document.getElementById('s').value);
-                if (min === 0 && sec === 0) {
-                    stopClock();
-                    playBuzzer(1.5, 150); // Deep, long buzzer
-                } else {
-                    if (sec === 0) { min--; sec = 59; } else { sec--; }
-                    document.getElementById('m').value = min;
-                    document.getElementById('s').value = sec.toString().padStart(2, '0');
-                }
-            }, 1000);
-        }
-        function stopClock() { clearInterval(mainInterval); mainInterval = null; }
-
-        // Quick Timer Logic
-        function quickTimer(duration) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            clearInterval(quickInterval);
-            let time = duration;
-            const display = document.getElementById('qDisplay');
-            display.innerText = time;
-            display.style.color = "white";
-            quickInterval = setInterval(() => {
-                time--;
-                display.innerText = time.toString().padStart(2, '0');
-                if (time <= 0) {
-                    clearInterval(quickInterval);
-                    display.style.color = "var(--danger)";
-                    playBuzzer(0.5, 400); // Shorter, higher-pitched beep
-                }
-            }, 1000);
-        }
-
-        // Score Logic
-        function changeScore(id, amt) {
-            let el = document.getElementById(id);
-            let val = parseInt(el.innerText) + amt;
-            el.innerText = val < 0 ? "00" : val.toString().padStart(2, '0');
-        }
-    </script>
-</body>
-</html>
+        .blue { background: #6366
