@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,6 +56,16 @@
         }
 
         /* Displays */
+        .clock-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5.5rem;
+            font-weight: 800;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        
         .display-text {
             font-size: 5.5rem;
             font-weight: 800;
@@ -77,8 +88,8 @@
             margin-bottom: 10px;
         }
         .clock-input {
-            width: 120px;
-            font-size: 5rem;
+            width: 110px;
+            font-size: 5.5rem;
             font-weight: 800;
             font-family: 'Courier New', monospace;
         }
@@ -112,9 +123,10 @@
 <body>
 
     <div class="main-container">
+        
         <div class="box">
             <div class="label">Game Clock</div>
-            <div class="display-text">
+            <div class="clock-wrapper">
                 <input type="number" id="m" class="clock-input" value="10">:
                 <input type="number" id="s" class="clock-input" value="00">
             </div>
@@ -128,8 +140,10 @@
             <div class="label">Quick Timer</div>
             <div id="qDisplay" class="display-text">00</div>
             <div class="btn-group">
-                <button class="blue" onclick="quickTimer(10)">10s</button>
-                <button class="blue" onclick="quickTimer(20)">20s</button>
+                <button class="blue" onclick="setQuickTimer(10)">Set 10s</button>
+                <button class="blue" onclick="setQuickTimer(20)">Set 20s</button>
+                <button class="green" onclick="startQuickTimer()">Start</button>
+                <button class="red" onclick="pauseQuickTimer()">Pause</button>
             </div>
         </div>
 
@@ -159,42 +173,94 @@
     <button class="gray" onclick="window.location.reload()">Reset Entire Board</button>
 
     <script>
-        let mainInterval, quickInterval;
+        let mainInterval = null;
+        let quickInterval = null;
+        let quickTimeLeft = 0;
 
-        // Clock Logic
+        // Buzzer Audio Generator
+        function playBuzzer() {
+            // Use Web Audio API to create a buzzer sound without needing external files
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            // 'square' wave creates a harsh, buzzer-like sound
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(300, audioCtx.currentTime); 
+            
+            // Fade out the sound quickly over 1 second
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 1);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 1);
+        }
+
+        // Game Clock Logic
         function startClock() {
             if (mainInterval) return;
             mainInterval = setInterval(() => {
                 let min = parseInt(document.getElementById('m').value);
                 let sec = parseInt(document.getElementById('s').value);
+                
                 if (min === 0 && sec === 0) {
                     stopClock();
+                    playBuzzer();
                     alert("Game Over!");
                 } else {
-                    if (sec === 0) { min--; sec = 59; } else { sec--; }
+                    if (sec === 0) { 
+                        min--; 
+                        sec = 59; 
+                    } else { 
+                        sec--; 
+                    }
                     document.getElementById('m').value = min;
-                    document.getElementById('sec');
                     document.getElementById('s').value = sec.toString().padStart(2, '0');
                 }
             }, 1000);
         }
-        function stopClock() { clearInterval(mainInterval); mainInterval = null; }
+        
+        function stopClock() { 
+            clearInterval(mainInterval); 
+            mainInterval = null; 
+        }
 
         // Quick Timer Logic
-        function quickTimer(duration) {
-            clearInterval(quickInterval);
-            let time = duration;
+        function setQuickTimer(duration) {
+            pauseQuickTimer();
+            quickTimeLeft = duration;
+            updateQuickDisplay();
+            document.getElementById('qDisplay').style.color = "white";
+        }
+
+        function startQuickTimer() {
+            if (quickInterval || quickTimeLeft <= 0) return;
+            
             const display = document.getElementById('qDisplay');
-            display.innerText = time;
             display.style.color = "white";
+            
             quickInterval = setInterval(() => {
-                time--;
-                display.innerText = time.toString().padStart(2, '0');
-                if (time <= 0) {
-                    clearInterval(quickInterval);
+                quickTimeLeft--;
+                updateQuickDisplay();
+                
+                if (quickTimeLeft <= 0) {
+                    pauseQuickTimer();
                     display.style.color = "var(--danger)";
+                    playBuzzer();
                 }
             }, 1000);
+        }
+
+        function pauseQuickTimer() {
+            clearInterval(quickInterval);
+            quickInterval = null;
+        }
+
+        function updateQuickDisplay() {
+            document.getElementById('qDisplay').innerText = quickTimeLeft.toString().padStart(2, '0');
         }
 
         // Score Logic
