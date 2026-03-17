@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4-Panel Game Console</title>
+    <title>Advanced Game Console</title>
     <style>
         :root {
             --bg: #0f172a;
@@ -12,7 +12,6 @@
             --text: #f8fafc;
             --danger: #ef4444;
             --success: #22c55e;
-            --secondary: #6366f1;
         }
         body {
             font-family: 'Inter', system-ui, sans-serif;
@@ -20,129 +19,118 @@
             color: var(--text);
             margin: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             min-height: 100vh;
         }
 
-        /* 2x2 Grid Layout */
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(2, 320px);
-            grid-template-rows: repeat(2, 380px);
+        /* Top Left Timer Section */
+        .top-controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
             gap: 20px;
-            padding: 20px;
+            background: var(--card);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        /* Unified Box Styling */
-        .box {
+        .timer-box {
+            text-align: center;
+            border-right: 1px solid #334155;
+            padding-right: 20px;
+        }
+        .timer-box:last-child { border: none; padding-right: 0; }
+
+        .timer-label { font-size: 0.7rem; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+        
+        /* Game Clock Inputs */
+        .clock-input-group { display: flex; align-items: center; gap: 5px; margin-bottom: 8px; }
+        .clock-input-group input {
+            width: 45px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        /* Scoreboard Section */
+        .scoreboard {
+            display: flex;
+            gap: 2rem;
+            margin-top: 80px;
+        }
+        .team-card {
             background: var(--card);
             padding: 2rem;
-            border-radius: 1.5rem;
+            border-radius: 1rem;
             text-align: center;
+            width: 260px;
             border: 1px solid #334155;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
         }
-
-        .label {
-            font-size: 0.8rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent);
-            margin-bottom: 10px;
-        }
-
-        /* Big Displays (Scores and Timers) */
-        .main-display {
-            font-size: 5rem;
-            font-weight: 800;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
-        }
-
-        /* Input Styling */
-        input {
+        .score-display { font-size: 5rem; font-weight: 800; margin: 1rem 0; color: var(--text); }
+        input.team-name {
             background: transparent;
             border: none;
-            color: white;
-            text-align: center;
-            font-family: inherit;
-        }
-        input.team-name {
-            font-size: 1.5rem;
-            font-weight: bold;
             border-bottom: 2px solid #334155;
+            color: var(--accent);
+            font-size: 1.5rem;
+            text-align: center;
             width: 100%;
         }
-        .clock-inputs {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 5rem;
-            font-weight: 800;
-        }
-        .clock-inputs input {
-            width: 110px;
-            font-size: 5rem;
-            font-weight: 800;
-        }
 
-        /* Button Grid */
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+        /* Generic Buttons */
         button {
-            padding: 12px;
+            padding: 6px 12px;
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            color: white;
-            transition: opacity 0.2s;
+            font-size: 0.8rem;
+            transition: filter 0.2s;
         }
-        button:active { transform: scale(0.98); }
-        .btn-green { background: var(--success); }
-        .btn-red { background: var(--danger); }
-        .btn-blue { background: var(--secondary); }
-        .btn-gray { background: #475569; }
-
+        button:active { transform: translateY(1px); }
+        .btn-green { background: var(--success); color: white; }
+        .btn-red { background: var(--danger); color: white; }
+        .btn-blue { background: #6366f1; color: white; }
+        
+        .score-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        .score-btns button { padding: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="grid-container">
-        
-        <div class="box">
-            <div class="label">Game Clock</div>
-            <div class="clock-inputs">
-                <input type="number" id="min" value="10" min="0" max="99">:
+    <div class="top-controls">
+        <div class="timer-box">
+            <div class="timer-label">Game Clock</div>
+            <div class="clock-input-group">
+                <input type="number" id="min" value="10" min="0" max="99">
+                <span>:</span>
                 <input type="number" id="sec" value="00" min="0" max="59">
             </div>
-            <div class="controls">
-                <button class="btn-green" id="start-btn" onclick="toggleClock()">Start</button>
-                <button class="btn-red" onclick="pauseClock()">Pause</button>
-            </div>
+            <button class="btn-green" id="start-btn" onclick="toggleGameClock()">Start</button>
+            <button class="btn-red" onclick="pauseGameClock()">Pause</button>
         </div>
 
-        <div class="box">
-            <div class="label">Question Timer</div>
-            <div id="quick-display" class="main-display">00</div>
-            <div class="controls">
-                <button class="btn-blue" onclick="runQuick(10)">10 Seconds</button>
-                <button class="btn-blue" onclick="runQuick(20)">20 Seconds</button>
-            </div>
+        <div class="timer-box">
+            <div class="timer-label">Quick Timer</div>
+            <div id="quick-display" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px;">00</div>
+            <button class="btn-blue" onclick="runQuickTimer(10)">10s</button>
+            <button class="btn-blue" onclick="runQuickTimer(20)">20s</button>
         </div>
+    </div>
 
-        <div class="box">
+    <div class="scoreboard">
+        <div class="team-card">
             <input type="text" class="team-name" value="HOME">
-            <div id="s1" class="main-display">0</div>
-            <div class="controls">
+            <div class="score-display" id="s1">0</div>
+            <div class="score-btns">
                 <button class="btn-green" onclick="add('s1', 10)">+10</button>
                 <button class="btn-green" onclick="add('s1', 5)">+5</button>
                 <button class="btn-red" onclick="add('s1', -10)">-10</button>
@@ -150,17 +138,16 @@
             </div>
         </div>
 
-        <div class="box">
+        <div class="team-card">
             <input type="text" class="team-name" value="AWAY">
-            <div id="s2" class="main-display">0</div>
-            <div class="controls">
+            <div class="score-display" id="s2">0</div>
+            <div class="score-btns">
                 <button class="btn-green" onclick="add('s2', 10)">+10</button>
                 <button class="btn-green" onclick="add('s2', 5)">+5</button>
                 <button class="btn-red" onclick="add('s2', -10)">-10</button>
                 <button class="btn-red" onclick="add('s2', -5)">-5</button>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -168,22 +155,22 @@
         let mainInterval;
         let isRunning = false;
 
-        function toggleClock() {
+        function toggleGameClock() {
             if (isRunning) return;
             isRunning = true;
-            document.getElementById('start-btn').style.opacity = "0.5";
+            document.getElementById('start-btn').disabled = true;
 
             mainInterval = setInterval(() => {
                 let m = parseInt(document.getElementById('min').value);
                 let s = parseInt(document.getElementById('sec').value);
 
                 if (m === 0 && s === 0) {
-                    pauseClock();
-                    alert("Time is up!");
+                    pauseGameClock();
+                    alert("Game Over!");
                     return;
                 }
 
-                if (s <= 0) {
+                if (s === 0) {
                     m--;
                     s = 59;
                 } else {
@@ -195,15 +182,15 @@
             }, 1000);
         }
 
-        function pauseClock() {
+        function pauseGameClock() {
             clearInterval(mainInterval);
             isRunning = false;
-            document.getElementById('start-btn').style.opacity = "1";
+            document.getElementById('start-btn').disabled = false;
         }
 
         // --- Quick Timer Logic ---
         let quickInterval;
-        function runQuick(seconds) {
+        function runQuickTimer(seconds) {
             clearInterval(quickInterval);
             let time = seconds;
             const display = document.getElementById('quick-display');
@@ -215,7 +202,7 @@
                 display.innerText = time.toString().padStart(2, '0');
                 if (time <= 0) {
                     clearInterval(quickInterval);
-                    display.style.color = "var(--danger)";
+                    display.style.color = "red";
                 }
             }, 1000);
         }
